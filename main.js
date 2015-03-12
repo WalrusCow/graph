@@ -1,7 +1,7 @@
 requirejs.config({
   urlArgs: "ts="+new Date().getTime(),
   paths: {
-    'graph': 'graph'
+    'graph': '.'
   }
 });
 
