@@ -9,7 +9,7 @@ define(['graph/edge'], function(Edge) {
 
     this.radius = 6;
     this.colour = options.colour || '#2f55ee';
-    this.fillColour = options.fillColour || '#fff';
+    this.fillColour = options.fillColour;
   }
 
   Node.prototype.addEdge = function(edge) {
@@ -31,8 +31,16 @@ define(['graph/edge'], function(Edge) {
   Node.prototype.draw = function(ctx) {
     ctx.beginPath();
     ctx.arc(this.coords.x, this.coords.y, this.radius, 0, 2 * Math.PI, false);
-    ctx.fillStyle = this.fillColour;
-    ctx.fill();
+    if (this.fillColour) {
+      ctx.fillStyle = this.fillColour;
+      ctx.fill();
+    }
+    else {
+      ctx.save();
+      ctx.clip();
+      ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+      ctx.restore();
+    }
     ctx.strokeStyle = this.colour;
     ctx.stroke();
   };

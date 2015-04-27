@@ -15,7 +15,6 @@ requirejs(['graph/generate'], function(generateGraph) {
     canvas: 'graphCanvas',
     graph: {
       node: {
-        fillColour: 'black',
         colour: 'red'
       },
       edge: {
