@@ -301,9 +301,9 @@ define(['lib/lines/lines', 'lib/matrix/matrix',
     delete this.edges[edge.id];
   };
 
-  Graph.prototype.draw = function(ctx) {
+  Graph.prototype.draw = function(ctx, animate) {
     function draw(elem) {
-      elem.draw(ctx);
+      elem.draw(ctx, animate);
     }
     this.edges.forEach(draw);
     this.nodes.forEach(draw);

@@ -23,4 +23,3 @@ requirejs(['graph/generate'], function(generateGraph) {
     }
   });
 });
-

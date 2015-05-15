@@ -7,6 +7,9 @@ define(['graph/edge'], function(Edge) {
     this.edges = [];
     this.degree = 0;
 
+    this.animating = false;
+    this.percentDrawn = 0;
+
     this.radius = 6;
     this.colour = options.colour || '#2f55ee';
     this.fillColour = options.fillColour;
@@ -28,21 +31,59 @@ define(['graph/edge'], function(Edge) {
     this.degree -= 1;
   };
 
-  Node.prototype.draw = function(ctx) {
+  Node.prototype._clear = function(ctx) {
     ctx.beginPath();
-    ctx.arc(this.coords.x, this.coords.y, this.radius, 0, 2 * Math.PI, false);
-    if (this.fillColour) {
+    // Damnit... There's a pixel missing from the edge because of the + 1,
+    // but if I don't and I draw multiple circles then the circle get fat...
+    ctx.arc(this.coords.x, this.coords.y, this.radius + 1, 0, 2 * Math.PI);
+    ctx.save();
+    ctx.clip();
+    ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+    ctx.restore();
+  };
+
+  Node.prototype._draw = function(ctx, start, end) {
+    this._clear(ctx);
+    ctx.beginPath();
+    ctx.arc(this.coords.x, this.coords.y, this.radius, start, end);
+    if (end - start >= 2 * Math.PI && this.fillColour) {
       ctx.fillStyle = this.fillColour;
       ctx.fill();
     }
-    else {
-      ctx.save();
-      ctx.clip();
-      ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-      ctx.restore();
-    }
     ctx.strokeStyle = this.colour;
     ctx.stroke();
+  };
+
+  Node.prototype.draw = function(ctx, animate) {
+    if (animate && this.animating) {
+      var step = .01;
+      var percent = step;
+      var ccw = Math.random() < 0.5;
+
+      // Shorthand
+      var x = this.coords.x;
+      var y = this.coords.y;
+      var r = this.radius;
+      var start = 0;
+      var self = this;
+
+      function draw() {
+        // Done
+        if (percent > 1 + step) return;
+        var d = percent * 2 * Math.PI;
+        // We will fake ccw so that _draw is simpler
+        if (ccw)
+          self._draw(ctx, start - d, start);
+        else
+          self._draw(ctx, start, start + d);
+        percent += step;
+        requestAnimationFrame(draw);
+      }
+      requestAnimationFrame(draw);
+    }
+    else {
+      this._draw(ctx, 0, 2 * Math.PI);
+    }
   };
 
   Node.prototype.adjacentTo = function(node) {

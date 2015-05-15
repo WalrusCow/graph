@@ -81,7 +81,7 @@ define(['graph/util', 'graph/graph'], function(util, Graph) {
     }
 
     graph.makeBarycentric();
-    graph.draw(ctx);
+    graph.draw(ctx, true);
     return graph;
   };
 });

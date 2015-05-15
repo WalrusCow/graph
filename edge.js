@@ -20,9 +20,17 @@ define(['lib/lines/lines'], function(lines) {
     return lines.intersect(this.line, edge.line);
   };
 
-  Edge.prototype.draw = function(ctx) {
+  Edge.prototype.draw = function(ctx, animate) {
     this.line.setContext(ctx);
     this.line.draw();
+  };
+
+  Edge.prototype._draw = function(ctx, start, end) {
+    ctx.beginPath();
+    ctx.moveTo(start.x, start.y);
+    ctx.lineTo(end.x, end.y);
+    ctx.strokeStyle = this._lineOpts.strokeColour;
+    ctx.stroke();
   };
 
   Edge.prototype.updateCoords = function() {
