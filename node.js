@@ -88,7 +88,7 @@ define(['graph/edge'], function(Edge) {
     this.animating = true;
     this.percentDrawn = 0;
     // TODO: Compute step based off of velocity and distance to travel
-    this.step = 0.01;
+    this.step = 0.02;
     // Randomly choose cw or ccw
     this.ccw = Math.random() < 0.5;
     // TODO: Take starting angle as input (from edge)

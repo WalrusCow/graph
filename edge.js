@@ -57,7 +57,7 @@ define(['lib/lines/lines'], function(lines) {
     // Begin animating drawing from "node"
     this.animating = true;
     this.percentDrawn = 0;
-    this.step = 0.01;
+    this.step = 0.02;
     this.drawStart = node;
     this.drawEnd = this.otherEnd(node);
   };
