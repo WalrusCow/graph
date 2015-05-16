@@ -305,8 +305,41 @@ define(['lib/lines/lines', 'lib/matrix/matrix',
     function draw(elem) {
       elem.draw(ctx, animate);
     }
-    this.edges.forEach(draw);
-    this.nodes.forEach(draw);
+
+    var toDrawCount = this.edges.length + this.nodes.length;
+    function cb() {
+      toDrawCount -= 1;
+    }
+
+    function prepForAnimate(elem) {
+      // Prep animation state
+      elem.percentDrawn = 0;
+      elem.animating = false;
+      elem.animateCallback = cb;
+    }
+    this.edges.forEach(prepForAnimate);
+    this.nodes.forEach(prepForAnimate);
+
+    // TODO: 0 may not be a valid index :O
+    this.nodes[0].startAnimation();
+
+    var animateDraw = (function() {
+      // Callback for animation frame
+      ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+      this.edges.forEach(draw);
+      this.nodes.forEach(draw);
+      if (toDrawCount > 0) {
+        requestAnimationFrame(animateDraw);
+      }
+    }).bind(this);
+
+    if (animate) {
+      requestAnimationFrame(animateDraw);
+    }
+    else {
+      this.edges.forEach(draw);
+      this.nodes.forEach(draw);
+    }
   };
 
   Graph._radialOrder = function(nodes, point) {

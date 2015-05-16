@@ -33,12 +33,12 @@ define(['graph/edge'], function(Edge) {
 
   Node.prototype._clear = function(ctx) {
     ctx.beginPath();
-    // Damnit... There's a pixel missing from the edge because of the + 1,
-    // but if I don't and I draw multiple circles then the circle get fat...
-    ctx.arc(this.coords.x, this.coords.y, this.radius + 1, 0, 2 * Math.PI);
+    // Clear the inside of the circle
+    ctx.arc(this.coords.x, this.coords.y, this.radius, 0, 2 * Math.PI);
     ctx.save();
     ctx.clip();
-    ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+    ctx.clearRect(this.coords.x - this.radius, this.coords.y - this.radius,
+                  2 * this.radius, 2 * this.radius);
     ctx.restore();
   };
 
@@ -55,35 +55,40 @@ define(['graph/edge'], function(Edge) {
   };
 
   Node.prototype.draw = function(ctx, animate) {
-    if (animate && this.animating) {
-      var step = .01;
-      var percent = step;
-      var ccw = Math.random() < 0.5;
-
-      // Shorthand
-      var x = this.coords.x;
-      var y = this.coords.y;
-      var r = this.radius;
-      var start = 0;
-      var self = this;
-
-      function draw() {
-        // Done
-        if (percent > 1 + step) return;
-        var d = percent * 2 * Math.PI;
-        // We will fake ccw so that _draw is simpler
-        if (ccw)
-          self._draw(ctx, start - d, start);
-        else
-          self._draw(ctx, start, start + d);
-        percent += step;
-        requestAnimationFrame(draw);
-      }
-      requestAnimationFrame(draw);
-    }
-    else {
+    if (!animate) {
       this._draw(ctx, 0, 2 * Math.PI);
+      return;
     }
+
+    if (this.animating) {
+      if (this.percentDrawn < 1) {
+        this.percentDrawn += this.step;
+      }
+
+      if (this.percentDrawn >= 1 && this.animateCallback) {
+        this.animateCallback();
+        // TODO: Dispatch events to neighbours
+        this.animateCallback = null;
+      }
+
+      var start = 0;
+      var d = this.percentDrawn * 2 * Math.PI;
+      // We will fake ccw so that _draw is simpler
+      if (this.ccw)
+        this._draw(ctx, start - d, start);
+      else
+        this._draw(ctx, start, start + d);
+    }
+  };
+
+  Node.prototype.startAnimation = function() {
+    this.animating = true;
+    this.percentDrawn = 0;
+    // TODO: Compute step based off of velocity and distance to travel
+    this.step = 0.01;
+    // Randomly choose cw or ccw
+    this.ccw = Math.random() < 0.5;
+    // TODO: Take starting angle as input (from edge)
   };
 
   Node.prototype.adjacentTo = function(node) {
