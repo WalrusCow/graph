@@ -67,8 +67,11 @@ define(['graph/edge'], function(Edge) {
 
       if (this.percentDrawn >= 1 && this.animateCallback) {
         this.animateCallback();
-        // TODO: Dispatch events to neighbours
         this.animateCallback = null;
+        this.edges.forEach(function(e) {
+          // Start animating neighbours if they haven't yet started
+          if (!e.animating) e.startAnimation(this);
+        }, this);
       }
 
       var start = 0;
