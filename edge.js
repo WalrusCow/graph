@@ -22,7 +22,7 @@ define(['lib/lines/lines'], function(lines) {
 
   Edge.prototype.draw = function(ctx, animate) {
     if (!animate) {
-      this._draw(this.u.coords, this.v.coords);
+      this._draw(ctx, this.u.coords, this.v.coords);
       return;
     }
 
